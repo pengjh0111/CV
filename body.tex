@@ -34,25 +34,18 @@
 \logosection{\faProjectDiagram}{科研与项目经历}
 
 %% ── 项目一 ──────────────────────────────────────
-\projecttitle{时序神经网络的调度技术研究}{%
-  投稿至 \key{USENIX OSDI 2026}，获 \key{strong reviews（4/3/2/2）}}
-
+\projecttitle{面向 STNN 的 Temporal-Tile 编译器 Chronos}{%
+  投稿至 \key{USENIX OSDI 2026}，获 \key{strong reviews（4/3/2/2）}，第一作者}
 \subtitle{项目概述}
-
-面向 \key{STNN（时空神经网络）} 的时序依赖问题，设计并实现并行调度系统，提出核心抽象 \key{tTile（Temporal Tile）}，统一建模跨时间步空间算子批处理与时间算子融合，在保持与 \key{cuDNN/cuBLAS} 完全兼容的前提下挖掘 \key{wavefront 并行性}。基于 \key{MLIR/ONNX-MLIR} 构建端到端 Pass Pipeline，以 \key{31.1K 行 C++} 实现完整编译与调度系统。
+面向 \key{STNN（时空神经网络）} 的时序依赖问题，设计并实现并行调度系统，提出核心抽象 \key{tTile（Temporal Tile）}，在保持与 \key{cuDNN/cuBLAS} 完全兼容的前提下挖掘 \key{wavefront 并行性}。基于 \key{MLIR/ONNX-MLIR} 构建端到端 Pass Pipeline，以 \key{31.1K 行 C++} 实现完整编译与调度系统。
 
 \subtitle{核心技术贡献}
 
 \begin{itemize}
-
-  \item \textbf{tTile 抽象与构建}：基于计算图依赖分析与类型标注，设计面向 STNN 时序结构的\key{子图静态划分策略}；提出解析式批处理尺寸选择方法，在 $O(\log T)$ 个候选中确定最优配置，将调度时间压缩至 \key{1.5--2.1 秒}
-
-  \item \textbf{双层调度算法}：inter-tTile 层通过对角 wavefront 挖掘跨时间步并行；intra-tTile 层通过多 Track 映射挖掘空间并行； 基于 \key{CUDA Stream} 实现动态调度，构建 SPSP 执行模式
-
-  \item \textbf{端到端编译路径}：在 \key{MLIR} 中实现 tTile 构建与优化，包括 \key{Loop Coalescing/Tiling}、\key{Operator Fusion}、\key{Buffer Reuse} 等 Pass，并完成 GPU/CPU 后端 lowering
-
-  \item \textbf{实验结果}：在 \key{Conv-based}（ConvLSTM、SpikeResNet）与\key{Transformer-based}（SpikeTransformer/BERT）共 \key{11 个 STNN workload} 上，相比 6 种主流方法实现 \key{1.25--2.04$\times$ GPU 加速}， 调度开销降低 \key{2--5 个数量级}
-
+  \item \textbf{IR 设计}：对计算图进行 \key{spatial/temporal 类型标注}，设计 tTile 作为\key{二维 Tiling 可调度单元}；基于 \key{BFS 图遍历}实现 tTile 构建算法，解析式评分函数在 $O(\log T)$ 个候选中选取最优 batch size，无需 autotuning
+  \item \textbf{算子融合与 Codegen}：时间算子跨时间步做 \key{Loop Fusion} 后经 \key{Loop Coalescing} 对齐 GPU 线程层级，再经 \key{Loop Tiling} 生成 CUDA kernel；空间 batch 算子 lower 至 \key{cuDNN/cuBLAS/cuTENSOR}，保持 vendor library 兼容性
+  \item \textbf{并行调度}：拓扑排序生成 \key{4D 算子坐标}，实现 inter-tTile 对角 \key{wavefront 并行} + intra-tTile 多路径并行（\key{SPSP 模式}）；\key{Track $\to$ CUDA Stream} 映射，\key{CUDA Event} 实现多级同步
+  \item \textbf{实验结果}：在 \key{Conv-based}（ConvLSTM、SpikeResNet）与 \key{Trans-based}（SpikeTransformer/BERT）共 \key{11 个 STNN workload} 上，相比 TVM/BladeDISC/Welder/TensorRT 实现 \key{1.25--2.04$\times$ GPU 加速}，调度开销降低 \key{2--5 个数量级}
 \end{itemize}
 %% ── 项目二 ──────────────────────────────────────
 \projecttitle{基于 MLIR 的 SNN 编译框架设计与实现}
@@ -82,7 +75,7 @@
 \begin{itemize}[parsep=0.5ex]
   \item \textbf{精通} \key{MLIR/LLVM 编译框架}，可独立设计 Dialect、开发优化 Pass 并构建多层 IR 转换 Pipeline；熟悉 GPU 后端优化：CUDA、Stream 并行、SM 调度、nsys / ncu profiling
   \item 熟悉主流编译优化技术：\key{Tiling}、\key{Loop Coalescing}、\key{Operator Fusion}、\key{Buffer Reuse}、\key{CSE}
-  \item 具备 \key{深度学习编译与推理系统}（ONNX-MLIR、TVM、TensorRT）实践经验，支持模型从前端表示到后端部署的端到端流程
+  \item 具备 \key{ML编译与推理系统}（ONNX-MLIR、TVM、TensorRT）实践经验，支持模型从前端到后端部署流程
   \item 扎实的 \key{C/C++} 编程能力与数据结构基础；熟悉 \key{Linux / Git / Docker / CMake} 开发环境
 \end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
