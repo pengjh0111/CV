@@ -1,0 +1,19 @@
+# LaTeX build files
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+*.toc
+*.lof
+*.lot
+*.missfont.log
+
+# macOS
+.DS_Store
+
+*.pdf
+
+*.jpg
