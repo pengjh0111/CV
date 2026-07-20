@@ -31,41 +31,46 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\logosection{\faBriefcase}{实习经历}
+
+\datedline{%
+  \textbf{华为 2012 实验室（编译器实验室）} \quad 编译器开发实习生%
+}{\dateRange{2026.06}{至今}}
+
+\begin{itemize}
+  \item 参与 \key{Triton-Ascend/AscendNPU-IR} 编译基础设施建设，聚焦 \key{Ascend NPU} 访存 IR 及端到端 Lowering 链路
+  \begin{itemize}[leftmargin=1.8em, label=$\diamond$, topsep=1pt, itemsep=1pt]
+    \item 重构 \key{hfusion.load/store} 及 Triton IR 至 AscendNPU-IR 的下降流程，以 hFusion Core Dialect 统一访存语义；将 MemRef/Bufferization 推迟至最终物化阶段，使中间层始终保持 \key{Tensor-level IR}
+    \item 完善复杂访存模式支持：Store 覆盖 no-mask、masked、2D masked 与 boundary-check，Load 支持 Padding 下的边界访问，并补齐 Mask/Padding 在 AscendNPU-IR 中的表达与转换
+  \end{itemize}
+  \item 参与「面向昇腾的编译优化及 Agent 技术合作项目」，负责统一 \key{IR 抽象}方向的方案设计
+\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \logosection{\faProjectDiagram}{科研与项目经历}
 
 %% ── 项目一 ──────────────────────────────────────
 \projecttitle{面向 STNN 的 Temporal-Tile 编译器 Chronos}{%
-  投稿至 \key{USENIX OSDI 2026}，获 \key{strong reviews（4/3/2/2）}，第一作者}
-\subtitle{项目概述}
-面向 \key{STNN（时空神经网络）} 的时序依赖问题，设计并实现并行调度系统，提出核心抽象 \key{tTile（Temporal Tile）}，在保持与 \key{cuDNN/cuBLAS} 完全兼容的前提下挖掘 \key{wavefront 并行性}。基于 \key{MLIR/ONNX-MLIR} 构建端到端 Pass Pipeline，以 \key{31.1K 行 C++} 实现完整编译与调度系统。
+  投稿至 \key{ACM SIGOPS ATC 2026}，第一作者}
 
-\subtitle{核心技术贡献}
+基于 \key{MLIR/ONNX-MLIR} 设计 STNN 并行调度系统，以 \key{tTile（Temporal Tile）} 抽象时序依赖，在兼容 \key{cuDNN/cuBLAS} 的同时挖掘 wavefront 并行性。
 
 \begin{itemize}
-  \item \textbf{IR 设计}：对计算图进行 \key{spatial/temporal 类型标注}，设计 tTile 作为\key{二维 Tiling 可调度单元}；基于 \key{BFS 图遍历}实现 tTile 构建算法，解析式评分函数在 $O(\log T)$ 个候选中选取最优 batch size，无需 autotuning
-  \item \textbf{算子融合与 Codegen}：时间算子跨时间步做 \key{Loop Fusion} 后经 \key{Loop Coalescing} 对齐 GPU 线程层级，再经 \key{Loop Tiling} 生成 CUDA kernel；空间 batch 算子 lower 至 \key{cuDNN/cuBLAS/cuTENSOR}，保持 vendor library 兼容性
-  \item \textbf{并行调度}：拓扑排序生成 \key{4D 算子坐标}，实现 inter-tTile 对角 \key{wavefront 并行} + intra-tTile 多路径并行（\key{SPSP 模式}）；\key{Track $\to$ CUDA Stream} 映射，\key{CUDA Event} 实现多级同步
-  \item \textbf{实验结果}：在 \key{Conv-based}（ConvLSTM、SpikeResNet）与 \key{Trans-based}（SpikeTransformer/BERT）共 \key{11 个 STNN workload} 上，相比 TVM/BladeDISC/Welder/TensorRT 实现 \key{1.25--2.04$\times$ GPU 加速}，调度开销降低 \key{2--5 个数量级}
+  \item 设计 spatial/temporal 类型标注与 tTile 构建算法；经 \key{Loop Fusion/Coalescing/Tiling} 生成 CUDA Kernel，空间 Batch 算子 Lower 至 \key{cuDNN/cuBLAS/cuTENSOR}，保持 Vendor Library 兼容性
+  \item 以 \key{4D 算子坐标}组织 inter-tTile wavefront 与 intra-tTile 多路径并行；在 11 个 STNN workload 上，相比 TVM、BladeDISC、Welder、TensorRT 实现 \key{1.25--2.04$\times$ 加速}，调度开销降低 \key{2--5 个数量级}
+  \item 通过解析式评分在 $O(\log T)$ 个候选中选取最优 batch size，无需 Autotuning；以 \key{Track $\to$ CUDA Stream} 完成并行映射，并通过 CUDA Event 编排跨 Track、跨层级依赖
 \end{itemize}
 %% ── 项目二 ──────────────────────────────────────
 \projecttitle{基于 MLIR 的 SNN 编译框架设计与实现}
 
-\subtitle{项目概述}
-
-面向 SNN 模型，基于 \key{MLIR} 设计多层编译框架与端到端 Lowering Pipeline：扩展 \key{ONNX Dialect} 支持 SNN 特有算子表示，定义 \key{Spike Dialect} 作为核心 IR 并对接目标芯片 intrinsic 指令，最终生成高效的 \key{C + intrinsic} 代码；同时提供 Python 前端接口，并参与算子优化与代码生成实现。
-
-\subtitle{核心技术贡献}
+基于 \key{MLIR} 构建 SNN 多层编译框架与端到端 Lowering Pipeline，支持模型从 ONNX 表示下降至目标芯片代码。
 
 \begin{itemize}
-
-  \item \textbf{ONNX Dialect 扩展}：在 \key{ONNX Dialect} 中新增 SNN 算子定义，支持 SNN 模型的统一前端表示与导入
-
-  \item \textbf{Spike Dialect 设计}：设计面向目标芯片的 \key{Spike Dialect}， 定义与 intrinsic 对应的 Operation 集合， 构建 ONNX → Spike 的\key{逐层 Lowering Pass}，  将高层语义映射为底层 \key{C + intrinsic} 实现
-
-  \item \textbf{编译优化}：在 Lowering 过程中实现\key{算子融合}、\key{循环变换}等优化 Pass，提升生成代码执行效率
-
-  \item \textbf{算子手工优化}：针对 \key{LIF}、\key{脉冲卷积} 等核心算子，结合硬件特性进行底层优化，实现基于 \key{intrinsic} 的高效算子代码
-
+  \item 扩展 \key{ONNX Dialect} 表示 SNN 算子，设计对接芯片 intrinsic 的 \key{Spike Dialect} 及 ONNX $\to$ Spike Lowering Pass
+  \item 实现算子融合、循环变换等优化，并针对 \key{LIF/脉冲卷积} 完成 intrinsic 级算子优化与 \key{C + intrinsic} 代码生成
+  \item 构建 \key{Python 前端}与自动代码生成链路，贯通模型导入、IR 转换、编译优化及目标代码生成
 \end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -94,12 +99,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \logosection{\faUniversity}{论文成果}
 
-\noindent [1]\ \textbf{Junhui Peng}, et al.
-\textit{Chronos: A Fast Temporal-Tile Scheduler for Spatiotemporal Neural Networks}.
-第一作者，投稿至 USENIX OSDI 2026，获 strong reviews（4/3/2/2）
+\noindent [1]\ Ke Yang, Guanghui Song, \textbf{Junhui Peng}, et al.
+\textit{Efficient GPU Inference for Discrete Neural Networks}.
+\key{MICRO 2026}
 
 \smallskip
-\noindent [2]\ Shihan Yuan, Zuoyan Zhang, Guanghui Song, \textbf{Junhui Peng}, et al.
+\noindent [2]\ \textbf{Junhui Peng}, et al.
+\textit{Chronos: A Fast Temporal-Tile Scheduler for Spatiotemporal Neural Networks}.
+第一作者，投稿至 \key{ACM SIGOPS ATC 2026}
+
+\smallskip
+\noindent [3]\ Shihan Yuan, Zuoyan Zhang, Guanghui Song, \textbf{Junhui Peng}, et al.
 \textit{A Decoupled Analytical Model for Tile Size Selection in Affine Programs}.
-ACM TACO
+\key{ACM TACO}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

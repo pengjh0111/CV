@@ -77,9 +77,7 @@
   \begin{center}
     \small
     \faPhone\ #1 \quad
-    \faEnvelope\ \href{mailto:#2}{#2} \quad
-    {\color{themeblue!60!black}%
-      \faBriefcase\ \textbf{实习状态：}可随时到岗，实习期 $\geq$ 6 个月}%
+    \faEnvelope\ \href{mailto:#2}{#2}%
   \end{center}%
   \vspace{-4pt}%
 }
